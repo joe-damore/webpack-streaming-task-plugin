@@ -8,6 +8,14 @@ and this project adheres to
 ## [Unreleased]
 ### Added
 - NPM status image to README.md
+- Error message when `task` callback returns falsy values
+
+### Changed
+- Slight improvements to README.md whitespace
+- Slight improvements to README.md 'Basic Usage' example
+
+### Fixed
+- Fix task duration calculation
 
 ## [0.1.0] - 2019-12-31
 ### Added
