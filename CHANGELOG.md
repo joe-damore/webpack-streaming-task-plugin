@@ -6,6 +6,8 @@ and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+
+## [0.1.1] - 2019-12-31
 ### Added
 - NPM status image to README.md
 - Error message when `task` callback returns falsy values
