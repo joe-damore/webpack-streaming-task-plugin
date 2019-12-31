@@ -316,7 +316,12 @@ class WebpackStreamingTaskPlugin {
         const changedFiles = getChangedFiles();
         const taskFileHasChanged = dependencyHasChanged(dependencyFiles, changedFiles);
 
-        if (this.prevTimestamps === null || taskFileHasChanged || always) {
+        // Determine if any previous timestamps have been saved.
+        const noPreviousTimestamps = (
+          this.prevTimestamps === null ||
+          this.prevTimestamps.length < 1);
+
+        if (noPreviousTimestamps || taskFileHasChanged || always) {
           const stream = vfs.src(source);
 
           // TODO Replace console.log with better output method.
