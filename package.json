@@ -1,10 +1,22 @@
 {
   "name": "webpack-streaming-task-plugin",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "Execute streaming tasks during Webpack compilation",
   "main": "index.js",
   "repository": "https://github.com/joe-damore/webpack-streaming-task-plugin.git",
   "author": "Joe D'Amore <joe@joedamore.me>",
   "license": "MIT",
-  "private": false
+  "private": false,
+  "dependencies": {
+    "ansi-colors": "^4.1.1",
+    "globby": "^10.0.1",
+    "vinyl-fs": "^3.0.3"
+  },
+  "keywords": [
+    "webpack",
+    "plugin",
+    "streaming",
+    "tasks",
+    "gulp"
+  ]
 }
