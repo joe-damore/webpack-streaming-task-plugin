@@ -16,6 +16,8 @@ and this project adheres to
 
 ### Fixed
 - Fix task duration calculation
+- Prevent subdirectories of existing watch directories from being watched
+- Remove existing watch directories that are subdirectories of new watch directories
 
 ## [0.1.0] - 2019-12-31
 ### Added
