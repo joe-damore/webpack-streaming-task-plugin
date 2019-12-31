@@ -75,7 +75,7 @@ const getDurationString = function(duration) {
   // Calculate durations.
   for (hours = 0; remaining > HOUR; remaining -= HOUR) { hours ++ }
   for (minutes = 0; remaining > MINUTE; remaining -= MINUTE) { minutes ++ }
-  for (seconds = 0; seconds > SECOND; remaining -= SECOND) { seconds ++ }
+  for (seconds = 0; remaining > SECOND; remaining -= SECOND) { seconds ++ }
   let ms = remaining;
 
   // Generate output string.
