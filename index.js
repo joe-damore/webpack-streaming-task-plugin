@@ -120,7 +120,7 @@ class WebpackStreamingTaskPlugin {
       task,
       name,
       always = false,
-      watchSourceDirectories = true,
+      watchSourceDirectories = false,
     } = this.options;
 
     /**
