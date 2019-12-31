@@ -143,12 +143,12 @@ class WebpackStreamingTaskPlugin {
     }
 
     /**
-     * Webpack hook that runs when files are emitted.
+     * Webpack hook that runs after files are emitted.
      *
      * @param {object} compilation - Webpack compilation object.
      * @param {function} callback - Callback upon execution completion.
      */
-    compiler.hooks.emit.tapAsync(
+    compiler.hooks.afterEmit.tapAsync(
       PLUGIN_NAME,
       async (compilation, callback) => {
 
