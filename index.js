@@ -326,15 +326,21 @@ class WebpackStreamingTaskPlugin {
 
           // TODO Replace console.log with better output method.
           console.log(`Executing task: ${colors.yellow(getTaskName())}`);
-          const taskResult = task(stream)
-            .on('error', onTaskError)
-            .on('finish', () => {
+          const taskResult = task(stream);
+          if (taskResult) {
+            taskResult.on('error', onTaskError);
+            taskResult.on('finish', () => {
               taskResult
-                .pipe(vfs.dest(destination))
                 .on('error', onTaskError)
                 .on('finish', onTaskFinish)
+                .pipe(vfs.dest(destination))
             });
-        } else {
+          }
+          else {
+            callback();
+          }
+        }
+        else {
           callback();
         }
 
