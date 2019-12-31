@@ -54,6 +54,19 @@ const emitError = function(compilation, message, err = null) {
 }
 
 /**
+ * Determines if child is a subdirectory of parent.
+ *
+ * @param  {string}  child - Path to potential subdirectory.
+ * @param  {string}  parent - Path to potential parent directory.
+ *
+ * @return {Boolean} True if child is a subdirectory of parent, false otherwise.
+ */
+const isDirectorySubdirectory = function(child, parent) {
+  const relative = path.relative(parent, child);
+  return relative && !relative.startsWith('..') && !path.isAbsolute(relative);
+}
+
+/**
  * Returns a string describing the given duration in human-readable format.
  *
  * @param  {integer} duration Millisecond duration.
@@ -73,9 +86,9 @@ const getDurationString = function(duration) {
   let seconds = 0;
 
   // Calculate durations.
-  for (hours = 0; remaining > HOUR; remaining -= HOUR) { hours ++ }
-  for (minutes = 0; remaining > MINUTE; remaining -= MINUTE) { minutes ++ }
-  for (seconds = 0; seconds > SECOND; remaining -= SECOND) { seconds ++ }
+  for (hours = 0; remaining >= HOUR; remaining -= HOUR) { hours ++ }
+  for (minutes = 0; remaining >= MINUTE; remaining -= MINUTE) { minutes ++ }
+  for (seconds = 0; remaining >= SECOND; remaining -= SECOND) { seconds ++ }
   let ms = remaining;
 
   // Generate output string.
@@ -237,10 +250,35 @@ class WebpackStreamingTaskPlugin {
           dependencyDirs
             // Filter out any directories that are already watched.
             .filter((directoryPath) => {
-              return (!compilation.contextDependencies.has(directoryPath))
+              // Filter this path if it is already in contextDependencies.
+              if (compilation.contextDependencies.has(directoryPath)) {
+                return false;
+              }
+
+              // Filter this path if a parent directory is already in contextDependencies.
+              if(Array.from(compilation.contextDependencies).some((parentPath) => {
+                return (isDirectorySubdirectory(directoryPath, parentPath));
+              })) {
+                return false;
+              }
+
+              return true;
             })
             // Add directory paths to context dependencies set.
             .forEach((directoryPath) => {
+              // If child paths already exist, they should be removed first.
+              Array.from(compilation.contextDependencies)
+                .filter((compilationPath) => {
+                  if (isDirectorySubdirectory(compilationPath, directoryPath)) {
+                    return true;
+                  }
+                  return false;
+                })
+                .forEach((compilationPath) => {
+                  compilation.contextDependencies.delete(compilationPath);
+                })
+
+              // Add the dependency directory.
               compilation.contextDependencies.add(directoryPath);
             });
         }
@@ -326,7 +364,13 @@ class WebpackStreamingTaskPlugin {
 
           // TODO Replace console.log with better output method.
           console.log(`Executing task: ${colors.yellow(getTaskName())}`);
-          const taskResult = task(stream)
+          const taskResult = task(stream);
+          if (!taskResult) {
+            emitError(compilation, `No stream retrieved from '${getTaskName()}' task. Is the return statement missing?`);
+            callback();
+            return;
+          }
+          taskResult
             .on('error', onTaskError)
             .on('finish', () => {
               taskResult
@@ -334,7 +378,8 @@ class WebpackStreamingTaskPlugin {
                 .on('error', onTaskError)
                 .on('finish', onTaskFinish)
             });
-        } else {
+        }
+        else {
           callback();
         }
 

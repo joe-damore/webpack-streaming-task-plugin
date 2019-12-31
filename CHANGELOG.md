@@ -7,6 +7,20 @@ and this project adheres to
 
 ## [Unreleased]
 
+## [0.1.1] - 2019-12-31
+### Added
+- NPM status image to README.md
+- Error message when `task` callback returns falsy values
+
+### Changed
+- Slight improvements to README.md whitespace
+- Slight improvements to README.md 'Basic Usage' example
+
+### Fixed
+- Fix task duration calculation
+- Prevent subdirectories of existing watch directories from being watched
+- Remove existing watch directories that are subdirectories of new watch directories
+
 ## [0.1.0] - 2019-12-31
 ### Added
 - Initial plugin file
