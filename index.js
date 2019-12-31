@@ -54,6 +54,19 @@ const emitError = function(compilation, message, err = null) {
 }
 
 /**
+ * Determines if child is a subdirectory of parent.
+ *
+ * @param  {string}  child - Path to potential subdirectory.
+ * @param  {string}  parent - Path to potential parent directory.
+ *
+ * @return {Boolean} True if child is a subdirectory of parent, false otherwise.
+ */
+const isDirectorySubdirectory = function(child, parent) {
+  const relative = path.relative(parent, child);
+  return relative && !relative.startsWith('..') && !path.isAbsolute(relative);
+}
+
+/**
  * Returns a string describing the given duration in human-readable format.
  *
  * @param  {integer} duration Millisecond duration.
