@@ -326,7 +326,13 @@ class WebpackStreamingTaskPlugin {
 
           // TODO Replace console.log with better output method.
           console.log(`Executing task: ${colors.yellow(getTaskName())}`);
-          const taskResult = task(stream)
+          const taskResult = task(stream);
+          if (!taskResult) {
+            emitError(compilation, `No stream retrieved from '${getTaskName()}' task. Is the return statement missing?`);
+            callback();
+            return;
+          }
+          taskResult
             .on('error', onTaskError)
             .on('finish', () => {
               taskResult
