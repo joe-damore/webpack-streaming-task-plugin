@@ -1,6 +1,8 @@
 # Webpack Streaming Task Plugin
 Execute tasks during Webpack compilation
 
+[![NPM](https://nodei.co/npm/webpack-streaming-task-plugin.png)](https://nodei.co/npm/webpack-streaming-task-plugin/)
+
 ## Overview
 This plugin executes streaming tasks during Webpack compilation, and can be
 used to easily leverage Gulp plugins while using Webpack.
