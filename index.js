@@ -250,10 +250,35 @@ class WebpackStreamingTaskPlugin {
           dependencyDirs
             // Filter out any directories that are already watched.
             .filter((directoryPath) => {
-              return (!compilation.contextDependencies.has(directoryPath))
+              // Filter this path if it is already in contextDependencies.
+              if (compilation.contextDependencies.has(directoryPath)) {
+                return false;
+              }
+
+              // Filter this path if a parent directory is already in contextDependencies.
+              if(Array.from(compilation.contextDependencies).some((parentPath) => {
+                return (isDirectorySubdirectory(directoryPath, parentPath));
+              })) {
+                return false;
+              }
+
+              return true;
             })
             // Add directory paths to context dependencies set.
             .forEach((directoryPath) => {
+              // If child paths already exist, they should be removed first.
+              Array.from(compilation.contextDependencies)
+                .filter((compilationPath) => {
+                  if (isDirectorySubdirectory(compilationPath, directoryPath)) {
+                    return true;
+                  }
+                  return false;
+                })
+                .forEach((compilationPath) => {
+                  compilation.contextDependencies.delete(compilationPath);
+                })
+
+              // Add the dependency directory.
               compilation.contextDependencies.add(directoryPath);
             });
         }
