@@ -9,9 +9,11 @@ used to easily leverage Gulp plugins while using Webpack.
 
 ## Installation
 Install the plugin with npm:
+
 `$ npm install webpack-streaming-task-plugin --save-dev`
 
 Or with Yarn:
+
 `$ yarn add webpack-streaming-task-plugin --dev`
 
 ## Basic Usage
