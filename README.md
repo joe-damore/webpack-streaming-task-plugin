@@ -38,7 +38,7 @@ const WebpackConfig = {
         return task
           .pipe(cssnano())
           .pipe(rename({
-            suffix: 'min',
+            suffix: '.min',
           }));
       },
     }),
