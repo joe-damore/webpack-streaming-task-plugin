@@ -412,7 +412,7 @@ class WebpackStreamingTaskPlugin {
         // Determine which files have changed.
         const changedFiles = getChangedFiles();
         const changedDependencies = getChangedDependencies(dependencyFiles, changedFiles);
-        const taskFileHasChanged = (changedDependencies > 0);
+        const taskFileHasChanged = (changedDependencies.length > 0);
 
         if (shouldSkip) {
           // TODO Replace console.log with better output method.
