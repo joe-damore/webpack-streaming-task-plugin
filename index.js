@@ -133,7 +133,10 @@ class WebpackStreamingTaskPlugin {
       task,
       name,
       always = false,
-      watchSourceDirectories = false,
+      watchMode: {
+        includeSourceDirectories = false,
+      }
+      watchSourceDirectories = undefined,
     } = this.options;
 
     /**
@@ -187,6 +190,22 @@ class WebpackStreamingTaskPlugin {
             const message = 'No \'task\' option defined. Skipping plugin execution.';
             emitWarning(compilation, message);
             return false;
+          }
+
+          // Emit a warning if watchSourceDirectories option is used, but don't end execution.
+          if (watchSourceDirectories !== undefined) {
+            const message = '\'watchSourceDirectories\' option has been deprecated and will be removed in a future release. Use \'watchMode.includeSourceDirectories\' instead.';
+            emitWarning(compilation, message);
+          }
+
+          /*
+           * Emit a warning if watchSourceDirectories option is used, and if it
+           * differs from the value provided in watchMode.includeSourceDirectories.
+           */
+          if (watchSourceDirectories !== undefined && includeSourceDirectories !== watchSourceDirectories) {
+            const message = 'Specified \'watchSourceDirectories\' option differs from \'watchMode.includeSourceDirectories\' value (which is \'false\' by default). ' +
+              'The value given using \'watchSourceDirectories\' will be used instead, but this option is deprecated and will be removed in a future release.';
+            emitWarning(compilation, message);
           }
 
           // TODO Allow arrays of tasks to be executed in sequence.
@@ -346,7 +365,13 @@ class WebpackStreamingTaskPlugin {
 
         // Add watch files and directories.
         addDependencyFiles(dependencyFiles);
-        if (watchSourceDirectories) {
+        const shouldWatchSourceDirectories = (() => {
+          if (watchSourceDirectories !== undefined) {
+            return watchSourceDirectories;
+          }
+          return includeSourceDirectories;
+        })();
+        if (shouldWatchSourceDirectories) {
           watchDependencyDirectories(dependencyDirs);
         }
 
