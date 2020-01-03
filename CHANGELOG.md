@@ -6,6 +6,13 @@ and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Added
+- `watchMode.includeSourceDirectories` option to replace `watchSourceDirectories`
+- `watchMode.skipInitialRun` option to skip task during inital run while in watch mode
+- `watchMode.changedFilesOnly` option only include changed files in task stream while in watch mode
+
+### Changed
+- Deprecate `watchSourceDirectories` option in favor of `watchMode.includeSourceDirectories`
 
 ## [0.1.1] - 2019-12-31
 ### Added
