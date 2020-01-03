@@ -1,6 +1,6 @@
 {
   "name": "webpack-streaming-task-plugin",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "description": "Execute streaming tasks during Webpack compilation",
   "main": "index.js",
   "repository": "https://github.com/joe-damore/webpack-streaming-task-plugin.git",
@@ -14,8 +14,11 @@
   },
   "keywords": [
     "webpack",
+    "webpack-plugin",
     "plugin",
+    "stream",
     "streaming",
+    "vinyl",
     "tasks",
     "gulp"
   ]
