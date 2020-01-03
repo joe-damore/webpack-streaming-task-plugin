@@ -6,6 +6,10 @@ and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Changed
+- Clarify error message when task output includes an error
+- Use `bach` to execute tasks
+
 ### Fixed
 - Fix error that occurs when `watchMode` option is not specified
 

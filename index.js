@@ -1,10 +1,10 @@
+const bach = require('bach');
 const colors = require('ansi-colors');
 const globby = require('globby');
 const path = require('path');
 const vfs = require('vinyl-fs');
 
 const PLUGIN_NAME = 'WebpackStreamingTaskPlugin';
-
 const DEFAULT_TASK_NAME = 'Streaming Task';
 
 /**
@@ -352,12 +352,38 @@ class WebpackStreamingTaskPlugin {
         }
 
         /**
+         * Displays a message in the console identifying the task to run.
+         */
+        const onTaskStart = function() {
+          // TODO Replace console.log with better output method.
+          console.log(`Executing task: ${colors.yellow(getTaskName())}`);
+        }
+
+        /**
          * Emits a Webpack compilation error.
+         *
+         * Occurs when a task fails to finish because it was interrupted by an
+         * error.
          *
          * @param  {Object} err - Error object to emit to Webpack.
          */
-        const onTaskError = function(err) {
+        const onTaskExecutionError = function(err) {
           console.error(`Stopped executing ${colors.yellow(getTaskName())} because an error occurred`);
+          const message = `${err.message} (During '${getTaskName()}' task)`;
+          emitError(compilation, message, err);
+          callback();
+        }
+
+        /**
+         * Emits a Webpack compilation error.
+         *
+         * Occurs when a task is able to finish, but its output contains at
+         * least one error.
+         *
+         * @param  {Object} err - Error object to emit to Webpack.
+         */
+        const onTaskResultError = function(err) {
+          console.error(`An error occurred while running ${colors.yellow(getTaskName())}`);
           const message = `${err.message} (During '${getTaskName()}' task)`;
           emitError(compilation, message, err);
           callback();
@@ -428,26 +454,31 @@ class WebpackStreamingTaskPlugin {
 
           const stream = vfs.src(streamSource);
 
-          // TODO Replace console.log with better output method.
-          console.log(`Executing task: ${colors.yellow(getTaskName())}`);
-          const taskResult = task(stream);
-          if (!taskResult) {
-            emitError(compilation, `No stream retrieved from '${getTaskName()}' task. Is the return statement missing?`);
-            callback();
-            return;
-          }
-          taskResult
-            .on('error', onTaskError)
-            .on('finish', () => {
-              taskResult
-                .pipe(vfs.dest(destination))
-                .on('error', onTaskError)
-                .on('finish', onTaskFinish)
+          const invoke = bach.settleSeries(
+            () => { return task(stream); },
+            {
+              create: function() {
+              },
+              before: function() {
+                onTaskStart();
+              },
+              after: function() {
+                onTaskFinish();
+              },
+              error: function() {
+                onTaskExecutionError();
+              },
             });
+
+          invoke((error, results) => {
+            if (error) {
+              onTaskResultError(error);
+            }
+          });
+
+          return;
         }
-        else {
-          callback();
-        }
+        callback();
 
         // Update file timestamp memory.
         this.prevTimestamps = compilation.fileTimestamps;
