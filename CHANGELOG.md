@@ -10,6 +10,7 @@ and this project adheres to
 - `watchMode.includeSourceDirectories` option to replace `watchSourceDirectories`
 - `watchMode.skipInitialRun` option to skip task during inital run while in watch mode
 - `watchMode.changedFilesOnly` option only include changed files in task stream while in watch mode
+- Additional keywords to `package.json`
 
 ### Changed
 - Deprecate `watchSourceDirectories` option in favor of `watchMode.includeSourceDirectories`

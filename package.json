@@ -14,8 +14,11 @@
   },
   "keywords": [
     "webpack",
+    "webpack-plugin",
     "plugin",
+    "stream",
     "streaming",
+    "vinyl",
     "tasks",
     "gulp"
   ]
