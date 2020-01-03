@@ -137,7 +137,7 @@ class WebpackStreamingTaskPlugin {
         skipInitialRun = false,
         changedFilesOnly = false,
         alwaysRun = false,
-      }
+      },
       watchSourceDirectories = undefined,
       always = undefined,
     } = this.options;
