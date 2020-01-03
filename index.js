@@ -136,6 +136,7 @@ class WebpackStreamingTaskPlugin {
       watchMode: {
         includeSourceDirectories = false,
         skipInitialRun = false,
+        changedFilesOnly = false,
       }
       watchSourceDirectories = undefined,
     } = this.options;
@@ -319,15 +320,15 @@ class WebpackStreamingTaskPlugin {
         }
 
         /**
-         * Determines whether or not any depended-upon files have changed.
+         * Returns an array of dependencies which have changed since last run.
          *
          * @param  {array} dependencyFiles Array of files that are depended on.
          * @param  {array} changedFiles    Array of files that have changed.
          *
-         * @return {bool} True if a depended file has changed, false otherwise.
+         * @return {array} Array of dependencies which have changed.
          */
-        const dependencyHasChanged = function(dependencyFiles, changedFiles) {
-          return changedFiles.some((filepath) => {
+        const getChangedDependencies = function(dependencyFiles, changedFiles) {
+          return changedFiles.filter((filepath) => {
             return dependencyFiles.includes(filepath);
           });
         }
@@ -386,15 +387,21 @@ class WebpackStreamingTaskPlugin {
 
         // Determine which files have changed.
         const changedFiles = getChangedFiles();
-        const taskFileHasChanged = dependencyHasChanged(dependencyFiles, changedFiles);
+        const changedDependencies = getChangedDependencies(dependencyFiles, changedFiles);
+        const taskFileHasChanged = (changedDependencies > 0);
 
         if (shouldSkip) {
           // TODO Replace console.log with better output method.
           console.log(`Skipping task '${colors.yellow(getTaskName())}' during initial run`);
         }
         if ((noPreviousTimestamps || taskFileHasChanged || always) && !shouldSkip) {
+          let streamSource = source;
 
-          const stream = vfs.src(source);
+          if (taskFileHasChanged && changedFilesOnly) {
+            streamSource = changedDependencies;
+          }
+
+          const stream = vfs.src(streamSource);
 
           // TODO Replace console.log with better output method.
           console.log(`Executing task: ${colors.yellow(getTaskName())}`);
