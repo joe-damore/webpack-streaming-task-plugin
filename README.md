@@ -57,6 +57,7 @@ The `options` object can contain the following properties:
 - `watchMode`: (Object) Configuration object for options related to Webpack's watch mode. (Optional)
 - `watchMode.includeSourceDirectories`: (Boolean) Only applies when in watch mode. By default, Webpack only watches for changes to the files specified by `source`, but directory-level changes (new files, new child directories, etc.) are ignored. When `includeSourceDirectories` is `true`, changes to any directories that contain files specified in `source` will trigger recompilation. (Optional, default `false`)
 - `watchMode.skipInitialRun`: (Boolean) Only applies when in watch mode. When `true`, this task is not executed upon Webpack's initial run. Instead, it will only run once changes to its source files are detected. (Optional, default `false`)
+- `watchMode.changedFilesOnly`: (Boolean) Only applies when in watch mode. When `true`, only files which have changed since last run will be included in the stream passed to this task. (Optional, default `false`)
 
 ### Deprecated Options
 The following options should no longer be used and will be removed in future releases. They only exist for legacy compatibility.
