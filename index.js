@@ -132,13 +132,14 @@ class WebpackStreamingTaskPlugin {
       destination = './',
       task,
       name,
-      always = false,
       watchMode: {
         includeSourceDirectories = false,
         skipInitialRun = false,
         changedFilesOnly = false,
+        alwaysRun = false,
       }
       watchSourceDirectories = undefined,
+      always = undefined,
     } = this.options;
 
     /**
@@ -205,9 +206,25 @@ class WebpackStreamingTaskPlugin {
            * differs from the value provided in watchMode.includeSourceDirectories.
            */
           if (watchSourceDirectories !== undefined && includeSourceDirectories !== watchSourceDirectories) {
-            const message = 'Specified \'watchSourceDirectories\' option differs from \'watchMode.includeSourceDirectories\' value (which is \'false\' by default). ' +
+            const message = 'Specified \'watchSourceDirectories\' option differs from \'watchMode.includeSourceDirectories\' (which is \'false\' by default). ' +
               'The value given using \'watchSourceDirectories\' will be used instead, but this option is deprecated and will be removed in a future release.';
             emitWarning(compilation, message);
+          }
+
+          // Emit a warning if always option is used, but don't cancel execution.
+          if (always !== undefined) {
+            const message = `'always' option has been deprecated and will be removed in a future release. Use 'watchMode.alwaysRun' instead.`;
+            emitWarning(compilation, message);
+          }
+
+          /*
+           * Emit a warning if always option is used, and if it differs from the
+           * value provided in watchMode.alwaysRun.
+           */
+          if (always !== undefined && alwaysRun !== always) {
+            const message = `Specified 'always' option differs from 'watchMode.alwaysRun' (which is 'false' by default). ` +
+              `The value given using 'always' will be used instead, but this option is deprecated and will be removed in a future release.`;
+              emitWarning(compilation, message);
           }
 
           // TODO Allow arrays of tasks to be executed in sequence.
@@ -373,6 +390,13 @@ class WebpackStreamingTaskPlugin {
         const dependencyFiles = await getDependencyFiles();
         const dependencyDirs = getDependencyDirectories(dependencyFiles);
 
+        const shouldAlwaysRun = (() => {
+          if (always !== undefined) {
+            return always;
+          }
+          return alwaysRun;
+        })();
+
         // Add watch files and directories.
         addDependencyFiles(dependencyFiles);
         const shouldWatchSourceDirectories = (() => {
@@ -394,7 +418,7 @@ class WebpackStreamingTaskPlugin {
           // TODO Replace console.log with better output method.
           console.log(`Skipping task '${colors.yellow(getTaskName())}' during initial run`);
         }
-        if ((noPreviousTimestamps || taskFileHasChanged || always) && !shouldSkip) {
+        if ((noPreviousTimestamps || taskFileHasChanged || shouldAlwaysRun) && !shouldSkip) {
           let streamSource = source;
 
           if (taskFileHasChanged && changedFilesOnly) {
