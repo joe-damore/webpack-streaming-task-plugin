@@ -6,6 +6,8 @@ and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+
+## [0.2.0] - 2020-01-03
 ### Added
 - `watchMode.includeSourceDirectories` option to replace `watchSourceDirectories`
 - `watchMode.alwaysRun` option to replace `always`
