@@ -132,15 +132,16 @@ class WebpackStreamingTaskPlugin {
       destination = './',
       task,
       name,
-      watchMode: {
-        includeSourceDirectories = false,
-        skipInitialRun = false,
-        changedFilesOnly = false,
-        alwaysRun = false,
-      },
       watchSourceDirectories = undefined,
       always = undefined,
     } = this.options;
+
+    const {
+      includeSourceDirectories = false,
+      skipInitialRun = false,
+      changedFilesOnly = false,
+      alwaysRun = false,
+    } = (this.options.watchMode || {});
 
     /**
      * Returns the most suitable name for this task.

@@ -6,6 +6,8 @@ and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Fixed
+- Fix error that occurs when `watchMode` option is not specified
 
 ## [0.2.0] - 2020-01-03
 ### Added
