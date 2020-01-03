@@ -53,5 +53,12 @@ The `options` object can contain the following properties:
 - `destination`: (String) Destination path for task output. (Optional, default `'./'`)
 - `task`: (Function) Task function. Includes a `task` parameter with which to pipe output.
 - `always`: (Boolean) For watch mode only. When `true`, this task will always be executed when Webpack runs, even if files specified in `source` are unchanged. (Optional, default `false`)
-- `watchSourceDirectories`: (Boolean) For watch mode only. When `true`, any changes to any directories containing files specified in `source` trigger a Webpack compilation. This can be useful when creating a new file or directory should trigger a task to execute. (Optional, default `false`)
 - `name`: (String) Name of task, used in log output (Optional)
+- `watchMode`: (Object) Configuration object for options related to Webpack's watch mode. (Optional)
+- `watchMode.includeSourceDirectories`: (Boolean) Only applies when in watch mode. By default, Webpack only watches for changes to the files specified by `source`, but directory-level changes (new files, new child directories, etc.) are ignored. When `includeSourceDirectories` is `true`, changes to any directories that contain files specified in `source` will trigger recompilation. (Optional, default `false`)
+- `watchMode.skipInitialRun`: (Boolean) Only applies when in watch mode. When `true`, this task is not executed upon Webpack's initial run. Instead, it will only run once changes to its source files are detected. (Optional, default `false`)
+
+### Deprecated Options
+The following options should no longer be used and will be removed in future releases. They only exist for legacy compatibility.
+
+- `watchSourceDirectories`: (Boolean) Deprecated. For watch mode only. Serves the same purpose as `watchMode.includeSourceDirectories`. **This option is deprecated. Use watchMode.includeSourceDirectories instead.**
