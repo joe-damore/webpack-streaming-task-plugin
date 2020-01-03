@@ -22,6 +22,8 @@ rename a CSS file that is separate from the main Webpack bundle.
 
 ```js
 const WebpackStreamingTaskPlugin = require('webpack-streaming-task-plugin');
+const cssnano = require('gulp-cssnano');
+const rename = require('gulp-rename');
 
 const WebpackConfig = {
   entry: './src/js/index.js',
