@@ -449,6 +449,7 @@ class WebpackStreamingTaskPlugin {
         if (shouldSkip) {
           // TODO Replace console.log with better output method.
           console.log(`Skipping task '${colors.yellow(getTaskName())}' during initial run`);
+          callback();
         }
         if ((noPreviousTimestamps || taskFileHasChanged || shouldAlwaysRun) && !shouldSkip) {
           let streamSource = source;
