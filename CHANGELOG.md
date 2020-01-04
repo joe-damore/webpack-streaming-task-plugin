@@ -13,6 +13,7 @@ and this project adheres to
 
 ### Fixed
 - Fix error that occurs when `watchMode` option is not specified
+- Avoid piping to `vfs.dest` when `destination` is `null` or `undefined`
 
 ## [0.2.0] - 2020-01-03
 ### Added

@@ -461,6 +461,9 @@ class WebpackStreamingTaskPlugin {
 
           const invoke = bach.settleSeries(
             () => {
+              if (!destination) {
+                return task(stream);
+              }
               return task(stream)
                 .pipe(vfs.dest(destination));
             },
