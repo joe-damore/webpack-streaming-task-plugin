@@ -485,8 +485,6 @@ class WebpackStreamingTaskPlugin {
             // Update file timestamp memory.
             plugin.prevTimestamps = compilation.fileTimestamps;
           });
-
-          return;
         }
         callback();
     });
