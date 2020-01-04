@@ -325,16 +325,18 @@ class WebpackStreamingTaskPlugin {
         /**
          * Gets an array of files that have been changed since the last run.
          *
+         * @param {Map|null} prevTimestamps File timestamps from previous run.
+         *
          * @return {array} Array of files that have been changed.
          */
-        const getChangedFiles = function() {
+        const getChangedFiles = function(prevTimestamps) {
           const timestamps = Array.from(compilation.fileTimestamps.keys());
           return timestamps.filter((filepath) => {
             const prevTime = (() => {
-              if (!plugin.prevTimestamps) {
+              if (!prevTimestamps) {
                 return plugin.startTime;
               }
-              return (plugin.prevTimestamps.get(filepath) || plugin.startTime);
+              return (prevTimestamps.get(filepath) || plugin.startTime);
             })();
             const newTime = (compilation.fileTimestamps.get(filepath) || Infinity);
 
@@ -442,7 +444,7 @@ class WebpackStreamingTaskPlugin {
         }
 
         // Determine which files have changed.
-        const changedFiles = getChangedFiles();
+        const changedFiles = getChangedFiles(this.prevTimestamps);
         const changedDependencies = getChangedDependencies(dependencyFiles, changedFiles);
         const taskFileHasChanged = (changedDependencies.length > 0);
 
