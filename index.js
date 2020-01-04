@@ -482,14 +482,13 @@ class WebpackStreamingTaskPlugin {
             if (error) {
               onTaskResultError(error);
             }
+            // Update file timestamp memory.
+            plugin.prevTimestamps = compilation.fileTimestamps;
           });
 
           return;
         }
         callback();
-
-        // Update file timestamp memory.
-        this.prevTimestamps = compilation.fileTimestamps;
     });
   }
 }
