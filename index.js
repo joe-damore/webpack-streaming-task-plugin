@@ -414,7 +414,7 @@ class WebpackStreamingTaskPlugin {
         // Determine if any previous timestamps have been saved.
         const noPreviousTimestamps = (
           this.prevTimestamps === null ||
-          this.prevTimestamps.length < 1);
+          this.prevTimestamps.size < 1);
 
         // Check if task should be skipped.
         const shouldSkip = (compiler.watchMode && noPreviousTimestamps && skipInitialRun);
@@ -451,6 +451,7 @@ class WebpackStreamingTaskPlugin {
           // TODO Replace console.log with better output method.
           console.log(`Skipping task '${colors.yellow(getTaskName())}' during initial run`);
           // Update file timestamp memory.
+          this.prevTimestamps = compilation.fileTimestamps;
           callback();
           return;
         }
