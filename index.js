@@ -451,7 +451,6 @@ class WebpackStreamingTaskPlugin {
           // TODO Replace console.log with better output method.
           console.log(`Skipping task '${colors.yellow(getTaskName())}' during initial run`);
           // Update file timestamp memory.
-          this.prevTimestamps = compilation.fileTimestamps;
           callback();
           return;
         }
@@ -486,12 +485,11 @@ class WebpackStreamingTaskPlugin {
               },
             });
 
+          this.prevTimestamps = compilation.fileTimestamps;
           invoke((error, results) => {
             if (error) {
               onTaskResultError(error);
             }
-            // Update file timestamp memory.
-            plugin.prevTimestamps = compilation.fileTimestamps;
             callback();
           });
         }
