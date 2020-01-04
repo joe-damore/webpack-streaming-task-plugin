@@ -485,14 +485,15 @@ class WebpackStreamingTaskPlugin {
             }
             callback();
           });
+          return;
         }
-        else {
-          if (shouldSkip) {
-            console.log(`Skipping task '${colors.yellow(getTaskName())}' during initial run\n`);
-          }
-          this.prevTimestamps = compilation.fileTimestamps;
-          callback();
+
+        if (shouldSkip) {
+          console.log(`Skipping task '${colors.yellow(getTaskName())}' during initial run\n`);
         }
+
+        this.prevTimestamps = compilation.fileTimestamps;
+        callback();
     });
   }
 }
