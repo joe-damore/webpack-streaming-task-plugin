@@ -402,7 +402,6 @@ class WebpackStreamingTaskPlugin {
         const onTaskFinish = function() {
           const taskDuration = (new Date() - taskStartTime);
           console.log(`Finished executing ${colors.yellow(getTaskName())} task in ${colors.whiteBright(getDurationString(taskDuration))}\n`);
-          callback();
         }
 
         // Validate options.
@@ -493,6 +492,7 @@ class WebpackStreamingTaskPlugin {
             }
             // Update file timestamp memory.
             plugin.prevTimestamps = compilation.fileTimestamps;
+            callback();
           });
         }
     });
