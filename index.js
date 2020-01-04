@@ -489,7 +489,6 @@ class WebpackStreamingTaskPlugin {
             plugin.prevTimestamps = compilation.fileTimestamps;
           });
         }
-        callback();
     });
   }
 }
