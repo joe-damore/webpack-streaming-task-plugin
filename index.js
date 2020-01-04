@@ -330,7 +330,12 @@ class WebpackStreamingTaskPlugin {
         const getChangedFiles = function() {
           const timestamps = Array.from(compilation.fileTimestamps.keys());
           return timestamps.filter((filepath) => {
-            const prevTime = (plugin.prevTimestamps.get(filepath) || plugin.startTime);
+            const prevTime = (() => {
+              if (!plugin.prevTimestamps) {
+                return plugin.startTime;
+              }
+              return (plugin.prevTimestamps.get(filepath) || plugin.startTime);
+            })();
             const newTime = (compilation.fileTimestamps.get(filepath) || Infinity);
 
             return (prevTime < newTime);
