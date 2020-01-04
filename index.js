@@ -455,7 +455,10 @@ class WebpackStreamingTaskPlugin {
           const stream = vfs.src(streamSource);
 
           const invoke = bach.settleSeries(
-            () => { return task(stream); },
+            () => {
+              return task(stream)
+                .pipe(vfs.dest(destination));
+            },
             {
               create: function() {
               },
