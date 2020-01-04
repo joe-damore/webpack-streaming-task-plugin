@@ -8,7 +8,7 @@ and this project adheres to
 ## [Unreleased]
 ### Changed
 - Slight improvements to README.md 'Basic Usage' example
-- Clarify error message when task output includes an error
+- Clarify distinction between task execution error and task output error
 - Use `bach` to execute tasks
 
 ### Fixed
