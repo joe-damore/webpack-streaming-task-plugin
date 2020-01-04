@@ -8,6 +8,11 @@ and this project adheres to
 ## [Unreleased]
 ### Changed
 - Slight improvements to README.md 'Basic Usage' example
+- Clarify error message when task output includes an error
+- Use `bach` to execute tasks
+
+### Fixed
+- Fix error that occurs when `watchMode` option is not specified
 
 ## [0.2.0] - 2020-01-03
 ### Added
