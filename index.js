@@ -447,15 +447,7 @@ class WebpackStreamingTaskPlugin {
         const changedDependencies = getChangedDependencies(dependencyFiles, changedFiles);
         const taskFileHasChanged = (changedDependencies.length > 0);
 
-        if (shouldSkip) {
-          // TODO Replace console.log with better output method.
-          console.log(`Skipping task '${colors.yellow(getTaskName())}' during initial run`);
-          // Update file timestamp memory.
-          this.prevTimestamps = compilation.fileTimestamps;
-          callback();
-          return;
-        }
-        if (noPreviousTimestamps || taskFileHasChanged || shouldAlwaysRun) {
+        if ((noPreviousTimestamps || taskFileHasChanged || shouldAlwaysRun) && !shouldSkip) {
           let streamSource = source;
 
           if (taskFileHasChanged && changedFilesOnly) {
@@ -495,6 +487,10 @@ class WebpackStreamingTaskPlugin {
           });
         }
         else {
+          if (shouldSkip) {
+            console.log(`Skipping task '${colors.yellow(getTaskName())}' during initial run\n`);
+          }
+          this.prevTimestamps = compilation.fileTimestamps;
           callback();
         }
     });
