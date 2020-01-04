@@ -52,7 +52,7 @@ const WebpackConfig = {
 The `options` object can contain the following properties:
 
 - `source`: (String or Array) Glob string or array of glob strings describing task input.
-- `destination`: (String) Destination path for task output. (Optional, default `'./'`)
+- `destination`: (String) Destination path for task output. Set to `null` to prevent piping output to the filesystem. (Optional, default `'./'`)
 - `task`: (Function) Task function. Includes a `task` parameter with which to pipe output.
 - `name`: (String) Name of task, used in log output (Optional)
 - `watchMode`: (Object) Configuration object for options related to Webpack's watch mode. (Optional)
