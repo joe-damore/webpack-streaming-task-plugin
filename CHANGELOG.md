@@ -13,7 +13,7 @@ and this project adheres to
 
 ### Fixed
 - Prevent error when `watchMode` option is not specified
-- Prevent piping to `vfs.dest` when `destination` is `null` or `undefined`
+- Prevent piping to `vfs.dest` when `destination` is `null`
 
 ## [0.2.0] - 2020-01-03
 ### Added
