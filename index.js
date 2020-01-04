@@ -493,6 +493,9 @@ class WebpackStreamingTaskPlugin {
             callback();
           });
         }
+        else {
+          callback();
+        }
     });
   }
 }
