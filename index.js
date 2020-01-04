@@ -454,7 +454,7 @@ class WebpackStreamingTaskPlugin {
           callback();
           return;
         }
-        if ((noPreviousTimestamps || taskFileHasChanged || shouldAlwaysRun) && !shouldSkip) {
+        if (noPreviousTimestamps || taskFileHasChanged || shouldAlwaysRun) {
           let streamSource = source;
 
           if (taskFileHasChanged && changedFilesOnly) {
