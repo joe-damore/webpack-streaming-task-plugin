@@ -7,6 +7,16 @@ and this project adheres to
 
 ## [Unreleased]
 
+## [0.2.1] - 2020-01-04
+### Changed
+- Slight improvements to README.md 'Basic Usage' example
+- Clarify distinction between task execution error and task output error
+- Use `bach` to execute tasks
+
+### Fixed
+- Prevent error when `watchMode` option is not specified
+- Prevent piping to `vfs.dest` when `destination` is `null`
+
 ## [0.2.0] - 2020-01-03
 ### Added
 - `watchMode.includeSourceDirectories` option to replace `watchSourceDirectories`

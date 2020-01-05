@@ -1,10 +1,10 @@
+const bach = require('bach');
 const colors = require('ansi-colors');
 const globby = require('globby');
 const path = require('path');
 const vfs = require('vinyl-fs');
 
 const PLUGIN_NAME = 'WebpackStreamingTaskPlugin';
-
 const DEFAULT_TASK_NAME = 'Streaming Task';
 
 /**
@@ -117,6 +117,8 @@ class WebpackStreamingTaskPlugin {
 
     this.startTime = Date.now();
     this.prevTimestamps = null;
+    this.hasRun = false;
+    this.hasSkipped = false;
 
     this.apply = this.apply.bind(this);
   }
@@ -132,15 +134,16 @@ class WebpackStreamingTaskPlugin {
       destination = './',
       task,
       name,
-      watchMode: {
-        includeSourceDirectories = false,
-        skipInitialRun = false,
-        changedFilesOnly = false,
-        alwaysRun = false,
-      },
       watchSourceDirectories = undefined,
       always = undefined,
     } = this.options;
+
+    const {
+      includeSourceDirectories = false,
+      skipInitialRun = false,
+      changedFilesOnly = false,
+      alwaysRun = false,
+    } = (this.options.watchMode || {});
 
     /**
      * Returns the most suitable name for this task.
@@ -174,6 +177,18 @@ class WebpackStreamingTaskPlugin {
         // Keep track of time it takes for task to execute.
         const taskStartTime = new Date();
         const plugin = this;
+
+        /**
+         * Updates file timestamps before and executes callback.
+         *
+         * @param  {Map|null} fileTimestamps Compilation file timestamps.
+         */
+        const beforeCallback = function(fileTimestamps) {
+          if (fileTimestamps) {
+            plugin.prevTimestamps = fileTimestamps;
+          }
+          callback();
+        }
 
         /**
          * Ensures that options object is configured in a valid way.
@@ -324,12 +339,19 @@ class WebpackStreamingTaskPlugin {
         /**
          * Gets an array of files that have been changed since the last run.
          *
+         * @param {Map|null} prevTimestamps File timestamps from previous run.
+         *
          * @return {array} Array of files that have been changed.
          */
-        const getChangedFiles = function() {
+        const getChangedFiles = function(prevTimestamps) {
           const timestamps = Array.from(compilation.fileTimestamps.keys());
           return timestamps.filter((filepath) => {
-            const prevTime = (plugin.prevTimestamps.get(filepath) || plugin.startTime);
+            const prevTime = (() => {
+              if (!prevTimestamps) {
+                return plugin.startTime;
+              }
+              return (prevTimestamps.get(filepath) || plugin.startTime);
+            })();
             const newTime = (compilation.fileTimestamps.get(filepath) || Infinity);
 
             return (prevTime < newTime);
@@ -351,15 +373,41 @@ class WebpackStreamingTaskPlugin {
         }
 
         /**
+         * Displays a message in the console identifying the task to run.
+         */
+        const onTaskStart = function() {
+          // TODO Replace console.log with better output method.
+          console.log(`Executing task: ${colors.yellow(getTaskName())}`);
+        }
+
+        /**
          * Emits a Webpack compilation error.
+         *
+         * Occurs when a task fails to finish because it was interrupted by an
+         * error.
          *
          * @param  {Object} err - Error object to emit to Webpack.
          */
-        const onTaskError = function(err) {
+        const onTaskExecutionError = function(err) {
           console.error(`Stopped executing ${colors.yellow(getTaskName())} because an error occurred`);
           const message = `${err.message} (During '${getTaskName()}' task)`;
           emitError(compilation, message, err);
-          callback();
+          beforeCallback(null);
+        }
+
+        /**
+         * Emits a Webpack compilation error.
+         *
+         * Occurs when a task is able to finish, but its output contains at
+         * least one error.
+         *
+         * @param  {Object} err - Error object to emit to Webpack.
+         */
+        const onTaskResultError = function(err) {
+          console.error(`An error occurred while running ${colors.yellow(getTaskName())}`);
+          const message = `${err.message} (During '${getTaskName()}' task)`;
+          emitError(compilation, message, err);
+          beforeCallback(null);
         }
 
         /**
@@ -368,23 +416,22 @@ class WebpackStreamingTaskPlugin {
         const onTaskFinish = function() {
           const taskDuration = (new Date() - taskStartTime);
           console.log(`Finished executing ${colors.yellow(getTaskName())} task in ${colors.whiteBright(getDurationString(taskDuration))}\n`);
-          callback();
         }
 
         // Validate options.
         if (!validateOptions()) {
           // If options fail to validate, cease plugin execution.
-          callback();
+          beforeCallback(null);
           return;
         }
 
         // Determine if any previous timestamps have been saved.
         const noPreviousTimestamps = (
           this.prevTimestamps === null ||
-          this.prevTimestamps.length < 1);
+          this.prevTimestamps.size < 1);
 
         // Check if task should be skipped.
-        const shouldSkip = (compiler.watchMode && noPreviousTimestamps && skipInitialRun);
+        const shouldSkip = (compiler.watchMode && !this.hasRun && !this.hasSkipped && skipInitialRun);
 
         // Get array of files and directories that this task depends on.
         const dependencyFiles = await getDependencyFiles();
@@ -410,15 +457,14 @@ class WebpackStreamingTaskPlugin {
         }
 
         // Determine which files have changed.
-        const changedFiles = getChangedFiles();
+        const changedFiles = getChangedFiles(this.prevTimestamps);
         const changedDependencies = getChangedDependencies(dependencyFiles, changedFiles);
         const taskFileHasChanged = (changedDependencies.length > 0);
 
-        if (shouldSkip) {
-          // TODO Replace console.log with better output method.
-          console.log(`Skipping task '${colors.yellow(getTaskName())}' during initial run`);
-        }
-        if ((noPreviousTimestamps || taskFileHasChanged || shouldAlwaysRun) && !shouldSkip) {
+        const hasRunBefore = this.hasRun;
+        this.hasRun = true;
+
+        if ((!hasRunBefore || taskFileHasChanged || shouldAlwaysRun) && !shouldSkip) {
           let streamSource = source;
 
           if (taskFileHasChanged && changedFilesOnly) {
@@ -427,29 +473,44 @@ class WebpackStreamingTaskPlugin {
 
           const stream = vfs.src(streamSource);
 
-          // TODO Replace console.log with better output method.
-          console.log(`Executing task: ${colors.yellow(getTaskName())}`);
-          const taskResult = task(stream);
-          if (!taskResult) {
-            emitError(compilation, `No stream retrieved from '${getTaskName()}' task. Is the return statement missing?`);
-            callback();
-            return;
-          }
-          taskResult
-            .on('error', onTaskError)
-            .on('finish', () => {
-              taskResult
-                .pipe(vfs.dest(destination))
-                .on('error', onTaskError)
-                .on('finish', onTaskFinish)
+          const invoke = bach.settleSeries(
+            () => {
+              if (!destination) {
+                return task(stream);
+              }
+              return task(stream)
+                .pipe(vfs.dest(destination));
+            },
+            {
+              create: function() {
+              },
+              before: function() {
+                onTaskStart();
+              },
+              after: function() {
+                onTaskFinish();
+              },
+              error: function() {
+                onTaskExecutionError();
+              },
             });
-        }
-        else {
-          callback();
+
+          this.prevTimestamps = compilation.fileTimestamps;
+          invoke((error, results) => {
+            if (error) {
+              onTaskResultError(error);
+            }
+            beforeCallback(null);
+          });
+          return;
         }
 
-        // Update file timestamp memory.
-        this.prevTimestamps = compilation.fileTimestamps;
+        if (shouldSkip) {
+          this.hasSkipped = true;
+          console.log(`Skipping task '${colors.yellow(getTaskName())}' during initial run\n`);
+        }
+
+        beforeCallback(compilation.fileTimestamps);
     });
   }
 }
