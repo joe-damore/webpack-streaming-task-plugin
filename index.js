@@ -184,7 +184,7 @@ class WebpackStreamingTaskPlugin {
          */
         const beforeCallback = function(fileTimestamps) {
           if (fileTimestamps) {
-            this.prevTimestamps = fileTimestamps;
+            plugin.prevTimestamps = fileTimestamps;
           }
           callback();
         }
