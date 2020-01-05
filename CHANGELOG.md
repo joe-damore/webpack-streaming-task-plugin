@@ -6,6 +6,8 @@ and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+
+## [0.2.1] - 2020-01-04
 ### Changed
 - Slight improvements to README.md 'Basic Usage' example
 - Clarify distinction between task execution error and task output error
