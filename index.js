@@ -182,7 +182,7 @@ class WebpackStreamingTaskPlugin {
          *
          * @param  {Map|null} fileTimestamps Compilation file timestamps.
          */
-        const beforeCallback(fileTimestamps) {
+        const beforeCallback = function(fileTimestamps) {
           if (fileTimestamps) {
             this.prevTimestamps = fileTimestamps;
           }
