@@ -508,7 +508,7 @@ class WebpackStreamingTaskPlugin {
           console.log(`Skipping task '${colors.yellow(getTaskName())}' during initial run\n`);
         }
 
-        wrapCallback(compilation.fileTimestamps);
+        beforeCallback(compilation.fileTimestamps);
     });
   }
 }
