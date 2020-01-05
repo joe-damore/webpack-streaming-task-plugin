@@ -118,6 +118,7 @@ class WebpackStreamingTaskPlugin {
     this.startTime = Date.now();
     this.prevTimestamps = null;
     this.hasRun = false;
+    this.hasSkipped = false;
 
     this.apply = this.apply.bind(this);
   }
@@ -430,7 +431,7 @@ class WebpackStreamingTaskPlugin {
           this.prevTimestamps.size < 1);
 
         // Check if task should be skipped.
-        const shouldSkip = (compiler.watchMode && noPreviousTimestamps && skipInitialRun);
+        const shouldSkip = (compiler.watchMode && !this.hasRun && !this.hasSkipped && skipInitialRun);
 
         // Get array of files and directories that this task depends on.
         const dependencyFiles = await getDependencyFiles();
@@ -505,6 +506,7 @@ class WebpackStreamingTaskPlugin {
         }
 
         if (shouldSkip) {
+          this.hasSkipped = true;
           console.log(`Skipping task '${colors.yellow(getTaskName())}' during initial run\n`);
         }
 
